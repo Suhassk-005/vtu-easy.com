@@ -1,45 +1,191 @@
 <!DOCTYPE html>
-<html>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4595746415136570"
-     crossorigin="anonymous"></script>
+<html lang="en">
 <head>
-  <title>vtu-easy.com</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VTU Easy</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f7fa;
+}
+
+/* HEADER */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #0f172a;
+    color: white;
+    padding: 15px 30px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 22px;
+}
+
+nav a {
+    color: white;
+    margin-left: 20px;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+/* MAIN LAYOUT */
+.container {
+    display: flex;
+    padding: 20px;
+}
+
+/* LEFT CONTENT */
+.main {
+    flex: 3;
+}
+
+/* RIGHT FEATURES */
+.sidebar {
+    flex: 1;
+    margin-left: 20px;
+}
+
+.sidebar h3 {
+    margin-bottom: 10px;
+}
+
+.feature {
+    background: white;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+}
+
+/* CARDS */
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card a {
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+}
+
+/* ADS SPACE */
+.ad {
+    background: #e2e8f0;
+    height: 90px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+    border-radius: 10px;
+    font-size: 14px;
+    color: #555;
+}
+
+/* FOOTER */
+footer {
+    background: #0f172a;
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+footer div {
+    margin: 10px 0;
+}
+</style>
 </head>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4595746415136570"
-     crossorigin="anonymous"></script>
+
 <body>
 
-<header class="header">
-  <h1>vtu-easy.com</h1>
+<!-- HEADER -->
+<header>
+    <h1>VTU Easy</h1>
+    <nav>
+        <a href="#">Home</a>
+        <a href="scheme.html">Syllabus</a>
+        <a href="#">Notes</a>
+        <a href="#">Contact</a>
+    </nav>
 </header>
 
+<!-- MAIN -->
 <div class="container">
 
-  <!-- Ad Placeholder -->
-  <div class="ad">Ad Space</div>
+    <!-- LEFT -->
+    <div class="main">
 
-  <!-- Neumorphic Card -->
-  <div class="card">
-    <h2>Welcome Students ❤️</h2>
-    <p>By Students, For Students</p>
+        <!-- ADS TOP -->
+        <div class="ad">Ad Space (Google AdSense Banner)</div>
 
-    <form id="accessForm">
-      <button type="submit">Enter Tracking Page</button>
-    </form>
-  </div>
+        <!-- CARDS -->
+        <div class="cards">
 
-  <!-- Ad -->
-  <div class="ad">Ad Space</div>
+            <div class="card">
+                <a href="scheme.html">Explore Syllabus</a>
+            </div>
+
+            <div class="card">Coming Soon</div>
+            <div class="card">Coming Soon</div>
+            <div class="card">Coming Soon</div>
+            <div class="card">Coming Soon</div>
+            <div class="card">Coming Soon</div>
+
+        </div>
+
+        <!-- ADS MIDDLE -->
+        <div class="ad">Ad Space (Responsive Ad)</div>
+
+    </div>
+
+    <!-- RIGHT SIDEBAR -->
+    <div class="sidebar">
+        <h3>Features</h3>
+
+        <div class="feature">✔ Easy VTU Syllabus</div>
+        <div class="feature">✔ Notes (Coming Soon)</div>
+        <div class="feature">✔ Previous Papers</div>
+        <div class="feature">✔ Fast Access</div>
+
+        <!-- SIDEBAR AD -->
+        <div class="ad">Ad Space</div>
+    </div>
 
 </div>
 
-<footer class="footer">
-  <a href="#">About</a> |
-  <a href="#">Privacy Policy</a> |
-  <a href="#">Contact</a>
+<!-- FOOTER -->
+<footer>
+    <div>
+        <h4>About</h4>
+        <p>VTU Easy helps students access syllabus, notes, and resources easily.</p>
+    </div>
+
+    <div>
+        <h4>Contact</h4>
+        <p>Email: support@vtu-easy.com</p>
+    </div>
 </footer>
 
-<script src="app.js"></script>
 </body>
 </html>
