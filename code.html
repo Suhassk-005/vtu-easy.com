@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Clean Glass IDE</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI;}
+body,html{height:100%;overflow:hidden;background:#0d1117;}
+
+#app{display:flex;height:100%;}
+
+/* LEFT */
+#left{width:50%;display:flex;flex-direction:column;}
+
+/* VIDEO */
+#video{height:50%;display:flex;flex-direction:column;}
+#videoBar{
+  padding:8px;
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+#yt{
+  padding:6px 10px;
+  border-radius:6px;
+  border:none;
+  outline:none;
+  background:#161b22;
+  color:white;
+}
+#video iframe{flex:1;width:100%;}
+
+/* BUTTON */
+button{
+  border:none;
+  padding:5px 10px;
+  border-radius:6px;
+  cursor:pointer;
+  color:#e6edf3;
+  background:#21262d;
+  border:1px solid #30363d;
+}
+button:hover{background:#30363d;}
+
+/* EXPLORER */
+#explorer{
+  flex:1;
+  background:#161b22;
+  color:#e6edf3;
+  overflow:auto;
+  padding:10px;
+  user-select:none;
+}
+
+.node{
+  padding:6px 8px;
+  border-radius:6px;
+  cursor:pointer;
+}
+.node:hover{background:#21262d;}
+.selected{
+  background:#176474;
+  color:white;
+}
+
+.children{margin-left:15px;display:none;}
+
+/* RIGHT */
+#right{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  position:relative;
+}
+
+/* BG */
+#bgContainer{
+  position:absolute;
+  width:100%;
+  height:100%;
+  z-index:0;
+}
+.bg-media{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+/* TOP */
+#topBar{
+  padding:10px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:#161b22;
+  color:#e6edf3;
+  border-bottom:1px solid #30363d;
+  z-index:2;
+}
+
+/* STATUS */
+#statusText{font-size:13px;}
+.status-saving{color:#ff9800;}
+.status-saved{color:#00e676;}
+.status-idle{color:#ffd600;}
+.status-error{color:#ff5252;}
+
+/* COLORS */
+.colors button{
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,0.3);
+  margin:3px;
+  padding:0;
+}
+
+/* EDITOR */
+#editor{
+  flex:1;
+  padding:12px;
+  overflow:auto;
+  color:white;
+  z-index:2;
+  background:transparent;
+}
+
+/* HANDLE */
+#handle{
+  width:6px;
+  background:#30363d;
+  cursor:ew-resize;
+}
+
+/* FAB */
+#saveFab{
+  position:absolute;
+  bottom:20px;
+  right:20px;
+  width:45px;
+  height:45px;
+  border-radius:50%;
+  background:#21262d;
+  border:1px solid #30363d;
+  color:white;
+  z-index:5;
+}
+
+/* MODAL */
+#modal{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.6);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:999;
+}
+
+#modalBox{
+  background:#161b22;
+  padding:20px;
+  border-radius:10px;
+  width:300px;
+  color:#e6edf3;
+}
+
+#modalInput{
+  width:100%;
+  padding:8px;
+  border-radius:6px;
+  border:1px solid #30363d;
+  background:#0d1117;
+  color:white;
+  margin:10px 0;
+}
+
+.modalActions{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div id="app">
+
+<div id="left">
+
+  <div id="video">
+    <div id="videoBar">
+      <input id="yt" placeholder="YouTube URL">
+      <button onclick="loadVideo()">Load</button>
+      <button onclick="openFolder()">Open</button>
+      <button onclick="createItem()">+ New</button>
+    </div>
+    <iframe id="frame"></iframe>
+  </div>
+
+  <div id="explorer"></div>
+
+</div>
+
+<div id="handle"></div>
+
+<div id="right">
+
+  <div id="bgContainer"></div>
+
+  <div id="topBar">
+    <div style="display:flex;gap:10px;">
+      <span id="fileName">No file selected</span>
+      <span id="statusText" class="status-idle">Idle</span>
+    </div>
+
+    <div class="colors">
+      <button style="background:red" onclick="setColor('red')"></button>
+      <button style="background:lime" onclick="setColor('lime')"></button>
+      <button style="background:cyan" onclick="setColor('cyan')"></button>
+      <button style="background:white" onclick="setColor('white')"></button>
+      <button style="background:yellow" onclick="setColor('yellow')"></button>
+      <button style="background:orange" onclick="setColor('orange')"></button>
+      <button style="background:pink" onclick="setColor('pink')"></button>
+      <button style="background:black" onclick="setColor('black')"></button>
+    </div>
+  </div>
+
+  <div id="editor" contenteditable="true"></div>
+
+  <button id="saveFab" onclick="saveFile()">💾</button>
+
+</div>
+
+</div>
+
+<!-- MODAL -->
+<div id="modal">
+  <div id="modalBox">
+    <h3>Create Item</h3>
+    <input id="modalInput" placeholder="Enter name..." />
+    <div class="modalActions">
+      <button onclick="closeModal()">Cancel</button>
+      <button onclick="confirmCreate()">Create</button>
+    </div>
+  </div>
+</div>
+
+<script>
+
+/* RESIZE */
+let drag=false;
+handle.onmousedown=()=>drag=true;
+window.onmouseup=()=>drag=false;
+window.onmousemove=(e)=>{
+  if(!drag) return;
+  left.style.width=e.clientX+"px";
+  video.style.height=e.clientY+"px";
+};
+
+/* VIDEO */
+function loadVideo(){
+  let id=yt.value.split("v=")[1];
+  if(id) frame.src="https://youtube.com/embed/"+id;
+}
+
+/* FILE SYSTEM */
+let root, selected, current;
+let openState={};
+
+async function openFolder(){
+  root=await window.showDirectoryPicker();
+  render();
+}
+
+async function render(){
+  explorer.innerHTML="";
+  await build(root, explorer, true, "");
+}
+
+async function build(dir, container, rootNode, path){
+  let p = path ? path + "/" + dir.name : dir.name;
+
+  let node=document.createElement("div");
+  node.className="node";
+  node.textContent=(rootNode?"📂 ":"📁 ")+dir.name;
+
+  let children=document.createElement("div");
+  children.className="children";
+
+  container.appendChild(node);
+  container.appendChild(children);
+
+  if(openState[p]) children.style.display="block";
+
+  node.onclick=()=>{
+    document.querySelectorAll(".node").forEach(n=>n.classList.remove("selected"));
+    node.classList.add("selected");
+    selected=dir;
+  };
+
+  node.ondblclick=async()=>{
+    let open=children.style.display==="block";
+    children.style.display=open?"none":"block";
+    openState[p]=!open;
+
+    if(children.dataset.loaded) return;
+    children.dataset.loaded=true;
+
+    for await(const e of dir.values()){
+      if(e.kind==="directory"){
+        await build(e, children, false, p);
+      }else{
+        let f=document.createElement("div");
+        f.className="node";
+        f.textContent="📄 "+e.name;
+        f.onclick=()=>openFile(e);
+        children.appendChild(f);
+      }
+    }
+  };
+}
+
+/* CREATE */
+function createItem(){
+  if(!selected){
+    statusText.innerText="Select folder";
+    statusText.className="status-error";
+    return;
+  }
+
+  modal.style.display="flex";
+  modalInput.value="";
+  modalInput.focus();
+}
+
+function closeModal(){
+  modal.style.display="none";
+}
+
+async function confirmCreate(){
+  let name=modalInput.value.trim();
+  if(!name) return;
+
+  let path = getPath(selected);
+  openState[path] = true; // KEEP OPEN
+
+  if(name.includes(".")){
+    await selected.getFileHandle(name,{create:true});
+  }else{
+    await selected.getDirectoryHandle(name,{create:true});
+  }
+
+  closeModal();
+  render();
+}
+
+/* PATH HELPER */
+function getPath(dir){
+  let path = dir.name;
+  return path;
+}
+
+modalInput.addEventListener("keydown",(e)=>{
+  if(e.key==="Enter") confirmCreate();
+});
+
+/* FILE */
+async function openFile(f){
+  current=f;
+  let file=await f.getFile();
+  editor.innerText=await file.text();
+  fileName.innerText=f.name;
+}
+
+/* SAVE */
+async function saveFile(){
+  if(!current){
+    statusText.innerText="No file";
+    statusText.className="status-error";
+    return;
+  }
+
+  statusText.innerText="Saving...";
+  statusText.className="status-saving";
+
+  const w=await current.createWritable();
+  await w.write(editor.innerText);
+  await w.close();
+
+  statusText.innerText="Saved ✓";
+  statusText.className="status-saved";
+
+  setTimeout(()=>{
+    statusText.innerText="Idle";
+    statusText.className="status-idle";
+  },1200);
+}
+
+/* CTRL+S */
+window.addEventListener("keydown",(e)=>{
+  if(e.ctrlKey && e.key==="s"){
+    e.preventDefault();
+    saveFile();
+  }
+});
+
+/* COLOR */
+function setColor(c){
+  editor.style.color=c;
+}
+
+/* BG DROP */
+editor.ondragover=e=>e.preventDefault();
+
+editor.ondrop=(e)=>{
+  e.preventDefault();
+
+  let file=e.dataTransfer.files[0];
+  let url=URL.createObjectURL(file);
+
+  bgContainer.innerHTML="";
+
+  let el;
+
+  if(file.type.startsWith("video")){
+    el=document.createElement("video");
+    el.src=url;
+    el.autoplay=true;
+    el.loop=true;
+    el.muted=true;
+  }else if(file.type.startsWith("image")){
+    el=document.createElement("img");
+    el.src=url;
+    localStorage.setItem("bg-image", url);
+  }else return;
+
+  el.className="bg-media";
+  bgContainer.appendChild(el);
+};
+
+/* LOAD BG */
+let saved=localStorage.getItem("bg-image");
+if(saved){
+  let img=document.createElement("img");
+  img.src=saved;
+  img.className="bg-media";
+  bgContainer.appendChild(img);
+}
+
+</script>
+
+</body>
+</html>
