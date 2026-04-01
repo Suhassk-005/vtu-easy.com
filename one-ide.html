@@ -268,8 +268,11 @@ window.onmousemove=(e)=>{
 
 /* VIDEO */
 function loadVideo(){
-  let id=yt.value.split("v=")[1];
-  if(id) frame.src="https://youtube.com/embed/"+id;
+  const url = yt.value;
+
+  if (url === "") return;
+
+  frame.src = url;
 }
 
 /* FILE SYSTEM */
